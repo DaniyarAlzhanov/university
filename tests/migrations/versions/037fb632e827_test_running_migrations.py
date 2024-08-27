@@ -5,13 +5,13 @@ Revises: de7e31fb5072
 Create Date: 2024-08-04 21:00:38.079337
 
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision = '037fb632e827'
-down_revision = 'de7e31fb5072'
+revision = "037fb632e827"
+down_revision = "de7e31fb5072"
 branch_labels = None
 depends_on = None
 

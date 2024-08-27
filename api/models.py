@@ -1,11 +1,12 @@
 import re
-from typing import Optional
 import uuid
+from typing import Optional
 
 from fastapi import HTTPException
-from pydantic import BaseModel, EmailStr, constr, validator
-
-from db.models import Base
+from pydantic import BaseModel
+from pydantic import constr
+from pydantic import EmailStr
+from pydantic import validator
 
 
 LETTER_MATCH_PATTERN = re.compile(r"[а-яА-Яa-zA-Z\-]+$")
@@ -23,7 +24,7 @@ class ShowUser(TunedModel):
     name: str
     surname: str
     email: EmailStr
-    is_active: bool  
+    is_active: bool
 
 
 class UserCreate(BaseModel):
@@ -31,21 +32,21 @@ class UserCreate(BaseModel):
     surname: str
     email: EmailStr
 
-    @validator('name')
+    @validator("name")
     def validate_name(cls, value):
         if not LETTER_MATCH_PATTERN.match(value):
             raise HTTPException(
                 status_code=422,
-                detail='Name should contains only letters',
+                detail="Name should contains only letters",
             )
         return value
-    
-    @validator('surname')
+
+    @validator("surname")
     def validate_surname(cls, value):
         if not LETTER_MATCH_PATTERN.match(value):
             raise HTTPException(
                 status_code=422,
-                detail='Surname should contains only letters',
+                detail="Surname should contains only letters",
             )
         return value
 
@@ -59,22 +60,22 @@ class UpdateUserResponse(BaseModel):
 
 
 class UpdateUserRequest(BaseModel):
-    name: Optional[constr(min_length=1)] # type: ignore
-    surname: Optional[constr(min_length=1)] # type: ignore
+    name: Optional[constr(min_length=1)]  # type: ignore
+    surname: Optional[constr(min_length=1)]  # type: ignore
     email: Optional[EmailStr]
 
-    @validator('name')
+    @validator("name")
     def validate_name(cls, value):
         if not LETTER_MATCH_PATTERN.match(value):
             raise HTTPException(
-                status_code=422, detail='Name should contains only letters.'
+                status_code=422, detail="Name should contains only letters."
             )
         return value
-    
-    @validator('surname')
+
+    @validator("surname")
     def validate_surname(cls, value):
         if not LETTER_MATCH_PATTERN.match(value):
             raise HTTPException(
-                status_code=422, detail='Surname should contains only letters.'
+                status_code=422, detail="Surname should contains only letters."
             )
         return value

@@ -23,7 +23,7 @@ services:
     ports:
       - "5433:5432"
     networks:
-      - custom 
+      - custom
 networks:
   custom:
     driver: bridge

@@ -5,13 +5,13 @@ Revises: b2974f670ba4
 Create Date: 2024-06-25 16:52:17.014347
 
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision = 'fa1e2a294892'
-down_revision = 'b2974f670ba4'
+revision = "fa1e2a294892"
+down_revision = "b2974f670ba4"
 branch_labels = None
 depends_on = None
 
