@@ -4,7 +4,12 @@ import pytest
 
 
 async def test_create_user(client, get_user_from_database):
-    user_data = {"name": "Daniyar", "surname": "Alzhanov", "email": "mail@mail.ru"}
+    user_data = {
+        "name": "Daniyar",
+        "surname": "Alzhanov",
+        "email": "mail@mail.ru",
+        "password": "TestPassword",
+    }
     resp = client.post("/user/", data=json.dumps(user_data))
     data_from_resp = resp.json()
     assert resp.status_code == 200
@@ -23,11 +28,17 @@ async def test_create_user(client, get_user_from_database):
 
 
 async def test_create_user_duplicate_email_error(client, get_user_from_database):
-    user_data = {"name": "Daniyar", "surname": "Alzhanov", "email": "mail@mail.ru"}
+    user_data = {
+        "name": "Daniyar",
+        "surname": "Alzhanov",
+        "email": "mail@mail.ru",
+        "password": "TestPassword",
+    }
     user_data_same_email = {
         "name": "Daniyar",
         "surname": "Alzhanov",
         "email": "mail@mail.ru",
+        "password": "TestPassword",
     }
     resp = client.post("/user/", data=json.dumps(user_data))
     data_from_resp = resp.json()

@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import timedelta
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from typing import Generator, Any
@@ -14,6 +15,7 @@ from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
 from db.session import get_db
+from security import create_access_token
 import settings
 from main import app
 
@@ -108,16 +110,30 @@ async def get_user_from_database(asyncpg_pool):
 @pytest.fixture
 async def create_user_in_database(asyncpg_pool):
     async def create_user_in_database(
-        user_id: str, name: str, surname: str, email: str, is_active: str
+        user_id: str,
+        name: str,
+        surname: str,
+        email: str,
+        is_active: str,
+        hashed_password: str,
     ):
         async with asyncpg_pool.acquire() as connection:
             return await connection.execute(
-                """INSERT INTO users VALUES ($1, $2, $3, $4, $5)""",
+                """INSERT INTO users VALUES ($1, $2, $3, $4, $5, $6)""",
                 user_id,
                 name,
                 surname,
                 email,
                 is_active,
+                hashed_password,
             )
 
     return create_user_in_database
+
+
+def create_test_auth_headers_for_user(email: str) -> dict[str, str]:
+    access_token = create_access_token(
+        data={"sub": email},
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+    return {"Authorization": f"Bearer {access_token}"}
