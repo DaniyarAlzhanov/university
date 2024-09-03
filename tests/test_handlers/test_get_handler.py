@@ -1,5 +1,7 @@
 from uuid import uuid4
 
+from tests.conftest import create_test_auth_headers_for_user
+
 
 async def test_get_user(
     client,
@@ -13,9 +15,13 @@ async def test_get_user(
         "email": "mail@mail.ru",
         "is_active": True,
         "hashed_password": "TestPassword",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     await create_user_in_database(**user_data)
-    resp = client.get(f'/user/?user_id={user_data["user_id"]}')
+    resp = client.get(
+        f'/user/?user_id={user_data["user_id"]}',
+        headers=create_test_auth_headers_for_user(user_data["email"]),
+    )
     assert resp.status_code == 200
     user_from_resp = resp.json()
     assert user_from_resp["user_id"] == str(user_data["user_id"])
@@ -35,9 +41,13 @@ async def test_get_user_validation_error(
         "email": "mail@mail.ru",
         "is_active": True,
         "hashed_password": "TestPassword",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     await create_user_in_database(**user_data)
-    resp = client.get("/user/?user_id=123")
+    resp = client.get(
+        "/user/?user_id=123",
+        headers=create_test_auth_headers_for_user(user_data["email"]),
+    )
     assert resp.status_code == 422
     data_from_response = resp.json()
     assert data_from_response == {
@@ -61,9 +71,76 @@ async def test_get_user_not_found(
         "email": "mail@mail.ru",
         "is_active": True,
         "hashed_password": "TestPassword",
+        "roles": ["ROLE_PORTAL_USER"],
     }
     user_id_for_finding = uuid4()
     await create_user_in_database(**user_data)
-    resp = client.get(f"/user/?user_id={user_id_for_finding}")
+    resp = client.get(
+        f"/user/?user_id={user_id_for_finding}",
+        headers=create_test_auth_headers_for_user(user_data["email"]),
+    )
     assert resp.status_code == 404
     assert resp.json() == {"detail": f"User with id {user_id_for_finding} not found."}
+
+
+async def test_get_user_unauth_error(
+    client, create_user_in_database, get_user_from_database
+):
+    user_data = {
+        "user_id": uuid4(),
+        "name": "Daniyar",
+        "surname": "Alzhanov",
+        "email": "mail@mail.ru",
+        "is_active": True,
+        "hashed_password": "TestPassword",
+        "roles": ["ROLE_PORTAL_USER"],
+    }
+    user_id_for_finding = uuid4()
+    await create_user_in_database(**user_data)
+    resp = client.get(
+        f"/user/?user_id={user_id_for_finding}",
+    )
+    assert resp.status_code == 401
+    assert resp.json() == {"detail": "Not authenticated"}
+
+
+async def test_get_user_bad_cred(client, create_user_in_database):
+    user_data = {
+        "user_id": uuid4(),
+        "name": "Daniyar",
+        "surname": "Alzhanov",
+        "email": "mail@mail.ru",
+        "is_active": True,
+        "hashed_password": "TestPassword",
+        "roles": ["ROLE_PORTAL_USER"],
+    }
+    await create_user_in_database(**user_data)
+    user_id = uuid4()
+    resp = client.get(
+        f"/user/?user_id={user_id}",
+        headers=create_test_auth_headers_for_user(user_data["email"] + "a"),
+    )
+    assert resp.status_code == 401
+    assert resp.json() == {"detail": "Could not validate credentials"}
+
+
+async def test_get_user_unauth(client, create_user_in_database):
+    user_data = {
+        "user_id": uuid4(),
+        "name": "Daniyar",
+        "surname": "Alzhanov",
+        "email": "mail@mail.ru",
+        "is_active": True,
+        "hashed_password": "TestPassword",
+        "roles": ["ROLE_PORTAL_USER"],
+    }
+    await create_user_in_database(**user_data)
+    user_id = uuid4()
+    bad_auth_headers = create_test_auth_headers_for_user(user_data["email"])
+    bad_auth_headers["Authorization"] += "a"
+    resp = client.get(
+        f"/user/?user_id={user_id}",
+        headers=bad_auth_headers,
+    )
+    assert resp.status_code == 401
+    assert resp.json() == {"detail": "Could not validate credentials"}
