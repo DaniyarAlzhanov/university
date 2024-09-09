@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+from db.models import PortalRole
 from tests.conftest import create_test_auth_headers_for_user
 
 
@@ -15,7 +16,7 @@ async def test_get_user(
         "email": "mail@mail.ru",
         "is_active": True,
         "hashed_password": "TestPassword",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     await create_user_in_database(**user_data)
     resp = client.get(
@@ -41,7 +42,7 @@ async def test_get_user_validation_error(
         "email": "mail@mail.ru",
         "is_active": True,
         "hashed_password": "TestPassword",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     await create_user_in_database(**user_data)
     resp = client.get(
@@ -71,7 +72,7 @@ async def test_get_user_not_found(
         "email": "mail@mail.ru",
         "is_active": True,
         "hashed_password": "TestPassword",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     user_id_for_finding = uuid4()
     await create_user_in_database(**user_data)
@@ -93,7 +94,7 @@ async def test_get_user_unauth_error(
         "email": "mail@mail.ru",
         "is_active": True,
         "hashed_password": "TestPassword",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     user_id_for_finding = uuid4()
     await create_user_in_database(**user_data)
@@ -112,7 +113,7 @@ async def test_get_user_bad_cred(client, create_user_in_database):
         "email": "mail@mail.ru",
         "is_active": True,
         "hashed_password": "TestPassword",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     await create_user_in_database(**user_data)
     user_id = uuid4()
@@ -132,7 +133,7 @@ async def test_get_user_unauth(client, create_user_in_database):
         "email": "mail@mail.ru",
         "is_active": True,
         "hashed_password": "TestPassword",
-        "roles": ["ROLE_PORTAL_USER"],
+        "roles": [PortalRole.ROLE_PORTAL_USER],
     }
     await create_user_in_database(**user_data)
     user_id = uuid4()
