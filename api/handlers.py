@@ -137,7 +137,7 @@ async def get_user_by_id(
     current_user: User = Depends(get_current_user_from_token),
 ) -> ShowUser:
     user = await _get_user_by_id(user_id, db)
-    if user is not None:
+    if user is None:
         raise HTTPException(
             status_code=404, detail=f"User with id {user_id} not found."
         )
@@ -170,7 +170,7 @@ async def update_user_by_id(
             raise HTTPException(status_code=403, detail="Forbidden.")
     try:
         updated_user_id = await _update_user(
-            updated_user_params=updated_user_params, db=db, user_id=user_id
+            updated_user_params=updated_user_params, session=db, user_id=user_id
         )
     except IntegrityError as err:
         logger.error(err)

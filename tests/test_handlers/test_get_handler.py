@@ -7,7 +7,6 @@ from tests.conftest import create_test_auth_headers_for_user
 async def test_get_user(
     client,
     create_user_in_database,
-    get_user_from_database,
 ):
     user_data = {
         "user_id": uuid4(),
